@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gabinete de Arte Digital: Laboratorio Completo</title>
+    <title>Gabinete de Arte Digital: Laboratorio de Sistemas Complejos</title>
     <style>
         :root {
             --bg-color: #0f0f13;
@@ -127,8 +127,8 @@
             display: block;
         }
 
-        /* Capas de Interfaz de Usuario Exclusivas */
-        #netart-ui, #poetry-ui {
+        /* Capas de Interfaz de Usuario */
+        #netart-ui, #poetry-ui, #diy-ui {
             display: none;
             position: absolute;
             width: 100%;
@@ -165,13 +165,12 @@
 
         .netart-body { padding: 10px; }
 
-        /* Poesía Electrónica Text Layout */
+        /* Poesía Electrónica Layout */
         #poetry-ui {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            pointer-events: none;
         }
 
         #poetry-box {
@@ -193,6 +192,223 @@
             transition: all 0.5s ease;
         }
 
+        /* --- INTERFAZ DIY: BLUEPRINT DE COMPUTACIÓN FÍSICA --- */
+        #diy-ui {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .schematic-box {
+            width: 720px;
+            height: 380px;
+            position: relative;
+            pointer-events: auto;
+        }
+
+        /* Capa SVG de Conexiones Punteadas */
+        .schematic-connections {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .schematic-connections path {
+            stroke: rgba(255, 255, 255, 0.25);
+            stroke-width: 1px;
+            stroke-dasharray: 4, 5;
+            fill: none;
+            transition: stroke 0.3s, stroke-width 0.3s;
+        }
+
+        .schematic-box.active-btn path.line-btn,
+        .schematic-box.active-ldr path.line-ldr {
+            stroke: var(--accent-color);
+            stroke-width: 1.5px;
+        }
+
+        /* Contenedores Absolutos de Componentes */
+        .comp-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .comp-label {
+            font-size: 8px;
+            color: #777;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Silueta Arduino */
+        .arduino-board {
+            width: 110px; height: 160px;
+            background: #000;
+            border: 1px solid #ffffff;
+            position: relative;
+        }
+        .mcu-chip {
+            width: 14px; height: 65px;
+            border: 1px solid #ffffff;
+            position: absolute; top: 45px; left: 42px;
+        }
+        .pin-header {
+            border-left: 1px dotted #ffffff;
+            position: absolute; width: 1px; height: 90px;
+            top: 15px; right: 6px;
+        }
+        .pin-header.power {
+            left: 6px; height: 45px; top: 95px;
+            border-left: none; border-right: 1px dotted #ffffff;
+        }
+
+        /* Silueta Pantalla LCD */
+        .lcd-display {
+            width: 180px; height: 70px;
+            background: #000;
+            border: 1px solid #ffffff;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: border-color 0.3s;
+        }
+        .lcd-display.active { border-color: var(--accent-color); }
+        .lcd-text {
+            color: #ffffff; font-size: 10px;
+            letter-spacing: 1px; line-height: 1.4;
+            transition: color 0.3s;
+        }
+        .lcd-display.active .lcd-text { color: var(--accent-color); }
+
+        /* Silueta Laptop */
+        .laptop-shell {
+            width: 140px; height: 95px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .laptop-screen {
+            width: 120px; height: 74px;
+            border: 1px solid #ffffff;
+            background: #000;
+            padding: 6px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .laptop-base {
+            width: 144px; height: 6px;
+            border: 1px solid #ffffff;
+            border-top: none;
+            background: #000;
+        }
+
+        /* ÁREA DE ANIMACIÓN GEOMÉTRICA (INTERNA LAPTOP) */
+        .laptop-canvas {
+            width: 100%; height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Figuras Geométricas */
+        .geo-shape {
+            position: absolute;
+            border: 1px solid #ffffff;
+            transition: all 0.4s ease;
+        }
+        
+        /* Estado por defecto (Cuadrado rotativo) */
+        .geo-shape.primary {
+            width: 30px; height: 30px;
+            animation: spin 6s linear infinite;
+        }
+        .geo-shape.secondary {
+            width: 14px; height: 14px;
+            animation: spin 3s linear infinite reverse;
+        }
+
+        /* Cambios estructurales por clases de estado */
+        .laptop-canvas.mode-btn .geo-shape.primary {
+            width: 0; height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 34px solid var(--accent-color);
+            border-top: none;
+            animation: pulseFast 0.2s infinite alternate;
+        }
+        .laptop-canvas.mode-btn .geo-shape.secondary {
+            display: none;
+        }
+
+        .laptop-canvas.mode-ldr .geo-shape.primary {
+            border-radius: 50%;
+            border-color: var(--accent-color);
+            width: var(--ldr-size, 25px);
+            height: var(--ldr-size, 25px);
+            animation: none;
+        }
+        .laptop-canvas.mode-ldr .geo-shape.secondary {
+            border-radius: 50%;
+            border-color: #ffffff;
+            width: calc(var(--ldr-size, 25px) / 2);
+            height: calc(var(--ldr-size, 25px) / 2);
+            animation: none;
+        }
+
+        /* Nodos de Sensores */
+        .sensor-node {
+            width: 65px; height: 45px;
+            background: #000;
+            border: 1px solid #ffffff;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: border-color 0.2s;
+        }
+        .sensor-node.active { border-color: var(--accent-color); }
+        
+        .ldr-icon { width: 20px; height: 20px; border: 1px dashed #ffffff; border-radius: 50%; }
+        .sensor-node.active .ldr-icon { border-color: var(--accent-color); }
+
+        .btn-icon { width: 14px; height: 14px; border: 1px solid #ffffff; }
+        .sensor-node.active .btn-icon { background: var(--accent-color); border-color: var(--accent-color); }
+
+        /* Silueta Motor DC */
+        .motor-node {
+            width: 65px; height: 50px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .motor-body {
+            width: 40px; height: 40px;
+            border: 1px solid #ffffff; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        .motor-body::before {
+            content: ''; position: absolute; top: -5px;
+            width: 10px; height: 4px; border: 1px solid #ffffff;
+        }
+        .motor-shaft { width: 16px; height: 16px; font-size: 14px; color: #ffffff; font-weight: bold; }
+
+        .motor-body.spinning { border-color: var(--accent-color); }
+        .motor-body.spinning .motor-shaft { color: var(--accent-color); animation: spin var(--motor-speed, 1s) linear infinite; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulseFast { from { transform: scale(0.8); } to { transform: scale(1.3); } }
+
         /* Ficha Teórica */
         #info-panel {
             background-color: var(--panel-color);
@@ -200,17 +416,8 @@
             padding: 20px;
             min-height: 120px;
         }
-
-        #style-title {
-            color: var(--accent-color);
-            margin-bottom: 8px;
-            font-size: 1.2rem;
-        }
-
-        #style-desc {
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
+        #style-title { color: var(--accent-color); margin-bottom: 8px; font-size: 1.2rem; }
+        #style-desc { font-size: 0.95rem; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -226,6 +433,7 @@
                 <button class="menu-btn" onclick="changeStyle('glitch', this)">5. Glitch Art</button>
                 <button class="menu-btn" onclick="changeStyle('lifesim', this)">6. Simulación de Vida</button>
                 <button class="menu-btn" onclick="changeStyle('poetry', this)">7. Poesía Electrónica</button>
+                <button class="menu-btn" onclick="changeStyle('diy', this)">8. DIY y Hardware Art</button>
             </nav>
 
             <div id="controls-panel">
@@ -267,6 +475,73 @@
                     <div style="color: var(--accent-color); font-size: 0.7rem; margin-top: 15px; letter-spacing: 2px;">[ ALGORITMO COMBINATORIO DADAÍSTA ]</div>
                 </div>
             </div>
+
+            <div id="diy-ui">
+                <div class="schematic-box" id="diy-hub">
+                    
+                    <svg class="schematic-connections">
+                        <path d="M 120 120 L 170 120 L 170 55 L 210 55" />
+                        <path d="M 120 190 L 170 190 L 170 260 L 210 260" />
+                        <path class="line-ldr" d="M 120 145 L 480 145 L 480 42 L 530 42" />
+                        <path class="line-btn" d="M 120 155 L 500 155 L 500 142 L 530 142" />
+                        <path d="M 120 165 L 480 165 L 480 255 L 530 255" />
+                    </svg>
+                    
+                    <div class="comp-container" style="left: 10px; top: 70px;">
+                        <div class="arduino-board">
+                            <div class="pin-header"></div>
+                            <div class="mcu-chip"></div>
+                            <div class="pin-header power"></div>
+                        </div>
+                        <div class="comp-label">Arduino Uno</div>
+                    </div>
+
+                    <div class="comp-container" style="left: 210px; top: 20px;">
+                        <div class="lcd-display" id="diy-lcd">
+                            <div class="lcd-text" id="lcd-line1">SYS_STANDBY</div>
+                            <div class="lcd-text" id="lcd-line2">AWAITING_SIGNAL</div>
+                        </div>
+                        <div class="comp-label">Pantalla LCD</div>
+                    </div>
+
+                    <div class="comp-container" style="left: 230px; top: 210px;">
+                        <div class="laptop-shell">
+                            <div class="laptop-screen">
+                                <div class="laptop-canvas" id="laptop-screen-art">
+                                    <div class="geo-shape primary"></div>
+                                    <div class="geo-shape secondary"></div>
+                                </div>
+                            </div>
+                            <div class="laptop-base"></div>
+                        </div>
+                        <div class="comp-label">Laptop / Host</div>
+                    </div>
+
+                    <div class="comp-container" style="left: 530px; top: 20px;">
+                        <div class="sensor-node" id="sns-ldr" onclick="triggerHardwareSensor('ldr')">
+                            <div class="ldr-icon"></div>
+                        </div>
+                        <div class="comp-label">Sensor LDR</div>
+                    </div>
+
+                    <div class="comp-container" style="left: 530px; top: 120px;">
+                        <div class="sensor-node" id="sns-btn" onclick="triggerHardwareSensor('btn')">
+                            <div class="btn-icon"></div>
+                        </div>
+                        <div class="comp-label">Pulsador Botón</div>
+                    </div>
+
+                    <div class="comp-container" style="left: 530px; top: 230px;">
+                        <div class="motor-node">
+                            <div class="motor-body" id="diy-motor-body">
+                                <div class="motor-shaft">┼</div>
+                            </div>
+                        </div>
+                        <div class="comp-label">Motor DC</div>
+                    </div>
+
+                </div>
+            </div>
         </div>
 
         <div id="info-panel">
@@ -280,6 +555,7 @@
         const ctx = canvas.getContext('2d');
         const netartUi = document.getElementById('netart-ui');
         const poetryUi = document.getElementById('poetry-ui');
+        const diyUi = document.getElementById('diy-ui');
         const styleTitle = document.getElementById('style-title');
         const styleDesc = document.getElementById('style-desc');
         const slidersContainer = document.getElementById('sliders-container');
@@ -289,7 +565,6 @@
         let t = 0; 
         let lastPoemTime = 0;
 
-        // Banco de variables globalizado
         let params = {
             netLines: 20, netSpeed: 4,
             genLines: 8, genSpeed: 0.02, genRadius: 0.35,
@@ -297,7 +572,8 @@
             randCount: 15, randAlpha: 0.6,
             glitchFrec: 0.8, glitchDistort: 60,
             lifeAgents: 40, lifeSpeed: 2, lifeMutation: 3,
-            poetFrec: 3, poetGlitch: 0
+            poetFrec: 3, poetGlitch: 0,
+            diyVoltage: 5.0, diyNoise: 12
         };
 
         let agents = [];
@@ -315,7 +591,8 @@
             random: { title: "Arte Randómico", desc: "Usa el azar informático como matriz conceptual. Cada instante es un evento caótico sin memoria de organización formal previa, emulando la entropía natural." },
             glitch: { title: "Glitch Art", desc: "La belleza del fallo sistémico. Altera intencionalmente búferes de memoria y datos binarios para criticar la obsesión tecnológica por la perfección pulida." },
             lifesim: { title: "Arte que Simula la Vida", desc: "Inspirado en la vida artificial y autómatas celulares. Los agentes digitales nacen, se mueven guiados por 'genes' de velocidad y mueren, convirtiendo el lienzo en un ecosistema simulado." },
-            poetry: { title: "Poesía Electrónica (Generativa)", desc: "El software actúa como un poeta cibernético combinando estructuras gramaticales al azar a intervalos temporales precisos, redefiniendo la literatura a través del código." }
+            poetry: { title: "Poesía Electrónica (Generativa)", desc: "El software actúa como un poeta cibernético combinando estructuras gramaticales al azar a intervalos temporales precisos, redefiniendo la literatura a través del código." },
+            diy: { title: "DIY (Hazlo Tú Mismo) y Computación Física", desc: "Se enfoca en la democratización del hardware y el hackeo de circuitos (Circuit Bending). Convierte magnitudes físicas reales del entorno (luz, impulsos de botones) en datos binarios interpretados para desencadenar acciones mecánicas y visuales directas." }
         };
 
         const slidersConfig = {
@@ -325,7 +602,8 @@
             random: [{ label: 'Elementos/Frame', id: 'randCount', min: 1, max: 50, step: 1 }, { label: 'Opacidad', id: 'randAlpha', min: 0.1, max: 1.0, step: 0.05 }],
             glitch: [{ label: 'Probabilidad Error', id: 'glitchFrec', min: 0.5, max: 0.99, step: 0.01 }, { label: 'Fuerza Ruido', id: 'glitchDistort', min: 5, max: 150, step: 5 }],
             lifesim: [{ label: 'Población Máxima', id: 'lifeAgents', min: 10, max: 150, step: 5 }, { label: 'Energía/Velocidad', id: 'lifeSpeed', min: 0.5, max: 5, step: 0.5 }, { label: 'Fluctuación Genética', id: 'lifeMutation', min: 1, max: 10, step: 0.5 }],
-            poetry: [{ label: 'Intervalo (Segundos)', id: 'poetFrec', min: 1, max: 8, step: 0.5 }, { label: 'Glitch Textual', id: 'poetGlitch', min: 0, max: 1, step: 1 }]
+            poetry: [{ label: 'Intervalo (Segundos)', id: 'poetFrec', min: 1, max: 8, step: 0.5 }, { label: 'Glitch Textual', id: 'poetGlitch', min: 0, max: 1, step: 1 }],
+            diy: [{ label: 'Voltaje Sim (V)', id: 'diyVoltage', min: 3.3, max: 5.0, step: 1.7 }, { label: 'Ruido Eléctrico', id: 'diyNoise', min: 0, max: 40, step: 2 }]
         };
 
         function buildSliders(style) {
@@ -357,6 +635,7 @@
 
             netartUi.style.display = (style === 'netart') ? 'block' : 'none';
             poetryUi.style.display = (style === 'poetry') ? 'flex' : 'none';
+            diyUi.style.display = (style === 'diy') ? 'flex' : 'none';
 
             styleTitle.innerText = infoStyles[style].title;
             styleDesc.innerText = infoStyles[style].desc;
@@ -364,12 +643,13 @@
             buildSliders(style);
             
             t = 0;
-            lastPoemTime = 0; // Forzar actualización de poema inmediato
+            lastPoemTime = 0;
             cancelAnimationFrame(animationFrameId);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if(style === 'lifesim') initLifeSimulation();
             if(style === 'poetry') generatePoem();
+            if(style === 'diy') resetHardwareDisplay();
 
             draw();
         }
@@ -383,15 +663,78 @@
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // --- SISTEMAS DE DIBUJO Y ANIMACIÓN ---
+
+        // --- LOGICA COMPUTACIÓN FÍSICA INTERACTIVA ---
+        function resetHardwareDisplay() {
+            document.getElementById('diy-lcd').classList.remove('active');
+            document.getElementById('diy-motor-body').classList.remove('spinning');
+            document.getElementById('diy-hub').className = "schematic-box";
+            
+            const screenArt = document.getElementById('laptop-screen-art');
+            screenArt.className = "laptop-canvas";
+            
+            document.querySelectorAll('.sensor-node').forEach(n => n.classList.remove('active'));
+            document.getElementById('lcd-line1').innerText = "SYS_READY";
+            document.getElementById('lcd-line2').innerText = "HOST_LINK: OK";
+        }
+
+        function triggerHardwareSensor(sensorType) {
+            const lcd = document.getElementById('diy-lcd');
+            const l1 = document.getElementById('lcd-line1');
+            const l2 = document.getElementById('lcd-line2');
+            const motor = document.getElementById('diy-motor-body');
+            const hub = document.getElementById('diy-hub');
+            const screenArt = document.getElementById('laptop-screen-art');
+            
+            document.querySelectorAll('.sensor-node').forEach(n => n.classList.remove('active'));
+            hub.className = "schematic-box"; 
+            lcd.classList.add('active');
+
+            let noise = (Math.random() - 0.5) * params.diyNoise;
+
+            if (sensorType === 'btn') {
+                hub.classList.add('active-btn');
+                document.getElementById('sns-btn').classList.add('active');
+                
+                l1.innerText = "CMD: BTN_PRESSED";
+                l2.innerText = "OUT: MOTOR_MAX";
+
+                // Motor a máxima velocidad
+                motor.style.setProperty('--motor-speed', '0.12s');
+                motor.classList.add('spinning');
+
+                // Cambiar Laptop a modo animación Triángulos
+                screenArt.className = "laptop-canvas mode-btn";
+
+            } else if (sensorType === 'ldr') {
+                hub.classList.add('active-ldr');
+                document.getElementById('sns-ldr').classList.add('active');
+                
+                let rawLight = Math.max(100, Math.min(1023, Math.floor(760 + noise)));
+                l1.innerText = "ADC: CH_A0 (LDR)";
+                l2.innerText = "VAL: " + rawLight + " LUMENS";
+
+                // Mapear motor proporcionalmente
+                let mappedSpeed = (1025 - rawLight) / 350; 
+                let finalSpeed = Math.max(0.06, Math.min(2.0, mappedSpeed));
+                motor.style.setProperty('--motor-speed', finalSpeed + 's');
+                motor.classList.add('spinning');
+
+                // Cambiar Laptop a modo Círculos Dinámicos
+                screenArt.className = "laptop-canvas mode-ldr";
+                // Mapear el tamaño del círculo de la pantalla según la luz del LDR
+                let shapeSize = Math.max(10, Math.min(55, (rawLight / 1023) * 60));
+                screenArt.style.setProperty('--ldr-size', shapeSize + 'px');
+            }
+        }
+
+        // --- LOOP CENTRAL DEL CANVAS ---
 
         function draw() {
-            // Limpieza controlada de fondo para evitar parpadeos o sobreescrituras incorrectas
-            if (currentStyle === 'netart' || currentStyle === 'random') {
+            if (currentStyle === 'netart' || currentStyle === 'random' || currentStyle === 'diy') {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
 
-            // Ejecución del motor gráfico según el estilo activo
             switch(currentStyle) {
                 case 'netart': drawNetArt(); break;
                 case 'generative': drawGenerative(); break;
@@ -400,11 +743,26 @@
                 case 'glitch': drawGlitch(); break;
                 case 'lifesim': drawLifeSim(); break;
                 case 'poetry': drawPoetry(); break;
+                case 'diy': drawDiyBlueprint(); break; 
             }
 
-            // Centralización del bucle interactivo (Solo estilos dinámicos por tiempo)
-            if (['generative', 'procedural', 'glitch', 'lifesim', 'poetry'].includes(currentStyle)) {
+            if (['generative', 'procedural', 'glitch', 'lifesim', 'poetry', 'diy'].includes(currentStyle)) {
                 animationFrameId = requestAnimationFrame(draw);
+            }
+        }
+
+        // Fondo Estilo Cuadrícula de Ingeniería Sutil
+        function drawDiyBlueprint() {
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+            ctx.lineWidth = 1;
+            let gridSize = 45;
+            for(let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for(let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
         }
 
@@ -471,7 +829,7 @@
             }
         }
 
-        // 6. SIMULACIÓN DE VIDA (Agentes autónomos)
+        // 6. SIMULACIÓN DE VIDA
         function initLifeSimulation() {
             agents = [];
             for(let i=0; i < params.lifeAgents; i++) {
@@ -536,7 +894,6 @@
             for(let i=0; i<canvas.height; i+=25) {
                 ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i + Math.sin(t + i)*40); ctx.stroke();
             }
-
             let now = Date.now();
             if (now - lastPoemTime > params.poetFrec * 1000) {
                 generatePoem();
@@ -544,17 +901,15 @@
             }
         }
 
-        // Interacción manual por Click
         canvas.addEventListener('click', () => {
             if(currentStyle === 'random' || currentStyle === 'netart') draw();
         });
 
-        // Inicializar la aplicación
         const firstBtn = document.querySelector('.menu-btn');
         changeStyle('netart', firstBtn);
         resizeCanvas();
 
-        // Drag & Drop para las ventanas de Net Art
+        // Ventanas flotantes NetArt (Drag)
         document.querySelectorAll('.netart-window').forEach(windowEl => {
             let isDragging = false; let offset = [0,0];
             windowEl.querySelector('.netart-header').addEventListener('mousedown', (e) => {
