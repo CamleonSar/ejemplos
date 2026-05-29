@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabinete de Arte Digital: Laboratorio Completo</title>
+    <style>
+        :root {
+            --bg-color: #0f0f13;
+            --panel-color: #1a1a24;
+            --accent-color: #00ffcc;
+            --text-color: #e0e0e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Menú Lateral */
+        sidebar {
+            width: 320px;
+            background-color: var(--panel-color);
+            border-right: 2px solid #2a2a3a;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: 1px solid #444;
+            color: var(--text-color);
+            padding: 10px;
+            margin-bottom: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .menu-btn:hover, .menu-btn.active {
+            background-color: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+        }
+
+        /* Panel de Controles (Sliders) */
+        #controls-panel {
+            background: #111116;
+            border: 1px solid #2a2a3a;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+
+        h3 {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            color: #aaa;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-color);
+            background: #2a2a3a;
+            cursor: pointer;
+        }
+
+        /* Contenedor Principal */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Zona de Exhibición de Arte */
+        #canvas-container {
+            flex: 1;
+            background-color: #000;
+            border: 1px solid #333;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Capas de Interfaz de Usuario Exclusivas */
+        #netart-ui, #poetry-ui {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        /* Net Art Style Windows */
+        .netart-window {
+            background: #c0c0c0;
+            border: 2px solid #fff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            width: 260px;
+            position: absolute;
+            color: #000;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            pointer-events: auto;
+        }
+
+        .netart-header {
+            background: linear-gradient(90deg, #000080, #1080d0);
+            color: white;
+            padding: 3px 5px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            cursor: move;
+            user-select: none;
+        }
+
+        .netart-body { padding: 10px; }
+
+        /* Poesía Electrónica Text Layout */
+        #poetry-ui {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        #poetry-box {
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px dashed var(--accent-color);
+            padding: 30px;
+            max-width: 500px;
+            text-align: center;
+            pointer-events: auto;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+        }
+
+        .poem-line {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 12px;
+            min-height: 1.5rem;
+            letter-spacing: 1px;
+            transition: all 0.5s ease;
+        }
+
+        /* Ficha Teórica */
+        #info-panel {
+            background-color: var(--panel-color);
+            border: 1px solid #2a2a3a;
+            padding: 20px;
+            min-height: 120px;
+        }
+
+        #style-title {
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        #style-desc {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <sidebar>
+        <div>
+            <h1>Art & Tech Lab</h1>
+            <nav style="display: flex; flex-direction: column;">
+                <button class="menu-btn active" onclick="changeStyle('netart', this)">1. Net Art</button>
+                <button class="menu-btn" onclick="changeStyle('generative', this)">2. Arte Generativo</button>
+                <button class="menu-btn" onclick="changeStyle('procedural', this)">3. Arte Procedural</button>
+                <button class="menu-btn" onclick="changeStyle('random', this)">4. Arte Randómico</button>
+                <button class="menu-btn" onclick="changeStyle('glitch', this)">5. Glitch Art</button>
+                <button class="menu-btn" onclick="changeStyle('lifesim', this)">6. Simulación de Vida</button>
+                <button class="menu-btn" onclick="changeStyle('poetry', this)">7. Poesía Electrónica</button>
+            </nav>
+
+            <div id="controls-panel">
+                <h3 id="controls-title">Parámetros</h3>
+                <div id="sliders-container"></div>
+            </div>
+        </div>
+        
+        <div style="font-size: 0.75rem; color: #666; text-align: center; margin-top: 15px;">
+            Prof. IA — 2026<br>Mueva los controles para alterar la obra.
+        </div>
+    </sidebar>
+
+    <main>
+        <div id="canvas-container">
+            <canvas id="artCanvas"></canvas>
+            
+            <div id="netart-ui">
+                <div class="netart-window" style="top: 15%; left: 10%;">
+                    <div class="netart-header"><span>system_error.dll</span></div>
+                    <div class="netart-body">
+                        <p>¿Es la red un museo descentralizado?<br><br> <a href="#" onclick="alert('Estética de red activada')">> Seguir hipervínculo</a></p>
+                    </div>
+                </div>
+                <div class="netart-window" style="top: 45%; left: 40%;">
+                    <div class="netart-header"><span>manifiesto.net</span></div>
+                    <div class="netart-body">
+                        <marquee id="netart-marquee" scrollamount="4">CÓDIGO ABIERTO, MENTE ABIERTA... SIN ADUANAS DE GALERÍAS...</marquee>
+                        <p align="center" style="font-size: 20px; margin-top: 5px;">🌐 💾 ⚙️</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="poetry-ui">
+                <div id="poetry-box">
+                    <div class="poem-line" id="line1">---</div>
+                    <div class="poem-line" id="line2">---</div>
+                    <div class="poem-line" id="line3">---</div>
+                    <div style="color: var(--accent-color); font-size: 0.7rem; margin-top: 15px; letter-spacing: 2px;">[ ALGORITMO COMBINATORIO DADAÍSTA ]</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="info-panel">
+            <h2 id="style-title">Net Art</h2>
+            <p id="style-desc">Cargando...</p>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('artCanvas');
+        const ctx = canvas.getContext('2d');
+        const netartUi = document.getElementById('netart-ui');
+        const poetryUi = document.getElementById('poetry-ui');
+        const styleTitle = document.getElementById('style-title');
+        const styleDesc = document.getElementById('style-desc');
+        const slidersContainer = document.getElementById('sliders-container');
+        
+        let currentStyle = 'netart';
+        let animationFrameId;
+        let t = 0; 
+        let lastPoemTime = 0;
+
+        // Banco de variables globalizado
+        let params = {
+            netLines: 20, netSpeed: 4,
+            genLines: 8, genSpeed: 0.02, genRadius: 0.35,
+            procFreq: 0.01, procAmp: 80, procSpeed: 0.01,
+            randCount: 15, randAlpha: 0.6,
+            glitchFrec: 0.8, glitchDistort: 60,
+            lifeAgents: 40, lifeSpeed: 2, lifeMutation: 3,
+            poetFrec: 3, poetGlitch: 0
+        };
+
+        let agents = [];
+
+        const lexicon = {
+            sujetos: ["El silicio", "Un algoritmo", "La red vacía", "El fantasma informático", "La base de datos", "Tu memoria RAM", "El servidor roto"],
+            verbos: ["sueña con", "desgarra", "calcula", "devora", "encripta", "respira bajo", "satura"],
+            predicados: ["espejos líquidos.", "infinitos errores 404.", "silencios binarios.", "pulsaciones eléctricas.", "la utopía del código.", "píxeles oxidados."]
+        };
+
+        const infoStyles = {
+            netart: { title: "Net Art", desc: "Utiliza la web como soporte y medio único. Cuestiona los límites físicos del arte mediante interfaces crudas, hipertextos e interactividad disruptiva." },
+            generative: { title: "Arte Generativo", desc: "Sistemas autónomos donde el artista prescribe un conjunto de reglas matemáticas y cede el control del resultado estético final a la computadora." },
+            procedural: { title: "Arte Procedural", desc: "Modelado paso a paso a través de lógica algorítmica estricta y funciones periódicas continuas (trigonometría), logrando armonía formal y fluida." },
+            random: { title: "Arte Randómico", desc: "Usa el azar informático como matriz conceptual. Cada instante es un evento caótico sin memoria de organización formal previa, emulando la entropía natural." },
+            glitch: { title: "Glitch Art", desc: "La belleza del fallo sistémico. Altera intencionalmente búferes de memoria y datos binarios para criticar la obsesión tecnológica por la perfección pulida." },
+            lifesim: { title: "Arte que Simula la Vida", desc: "Inspirado en la vida artificial y autómatas celulares. Los agentes digitales nacen, se mueven guiados por 'genes' de velocidad y mueren, convirtiendo el lienzo en un ecosistema simulado." },
+            poetry: { title: "Poesía Electrónica (Generativa)", desc: "El software actúa como un poeta cibernético combinando estructuras gramaticales al azar a intervalos temporales precisos, redefiniendo la literatura a través del código." }
+        };
+
+        const slidersConfig = {
+            netart: [{ label: 'Densidad', id: 'netLines', min: 5, max: 60, step: 1 }, { label: 'Velocidad', id: 'netSpeed', min: 1, max: 15, step: 1 }],
+            generative: [{ label: 'Ejes Geométricos', id: 'genLines', min: 2, max: 24, step: 1 }, { label: 'Velocidad', id: 'genSpeed', min: 0.005, max: 0.1, step: 0.005 }, { label: 'Radio', id: 'genRadius', min: 0.1, max: 0.5, step: 0.01 }],
+            procedural: [{ label: 'Frecuencia', id: 'procFreq', min: 0.002, max: 0.05, step: 0.001 }, { label: 'Amplitud', id: 'procAmp', min: 10, max: 200, step: 5 }, { label: 'Velocidad', id: 'procSpeed', min: 0.005, max: 0.08, step: 0.005 }],
+            random: [{ label: 'Elementos/Frame', id: 'randCount', min: 1, max: 50, step: 1 }, { label: 'Opacidad', id: 'randAlpha', min: 0.1, max: 1.0, step: 0.05 }],
+            glitch: [{ label: 'Probabilidad Error', id: 'glitchFrec', min: 0.5, max: 0.99, step: 0.01 }, { label: 'Fuerza Ruido', id: 'glitchDistort', min: 5, max: 150, step: 5 }],
+            lifesim: [{ label: 'Población Máxima', id: 'lifeAgents', min: 10, max: 150, step: 5 }, { label: 'Energía/Velocidad', id: 'lifeSpeed', min: 0.5, max: 5, step: 0.5 }, { label: 'Fluctuación Genética', id: 'lifeMutation', min: 1, max: 10, step: 0.5 }],
+            poetry: [{ label: 'Intervalo (Segundos)', id: 'poetFrec', min: 1, max: 8, step: 0.5 }, { label: 'Glitch Textual', id: 'poetGlitch', min: 0, max: 1, step: 1 }]
+        };
+
+        function buildSliders(style) {
+            slidersContainer.innerHTML = '';
+            slidersConfig[style].forEach(conf => {
+                const group = document.createElement('div');
+                group.className = 'control-group';
+                group.innerHTML = `
+                    <label><span>${conf.label}</span><span id="val-${conf.id}">${params[conf.id]}</span></label>
+                    <input type="range" id="${conf.id}" min="${conf.min}" max="${conf.max}" step="${conf.step}" value="${params[conf.id]}">
+                `;
+                slidersContainer.appendChild(group);
+
+                const input = group.querySelector('input');
+                input.addEventListener('input', (e) => {
+                    params[conf.id] = parseFloat(e.target.value);
+                    document.getElementById(`val-${conf.id}`).innerText = e.target.value;
+                    if(conf.id === 'netSpeed') document.getElementById('netart-marquee').scrollAmount = e.target.value;
+                    if(conf.id === 'lifeAgents') initLifeSimulation();
+                    if(currentStyle === 'random') draw();
+                });
+            });
+        }
+
+        function changeStyle(style, button) {
+            currentStyle = style;
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            netartUi.style.display = (style === 'netart') ? 'block' : 'none';
+            poetryUi.style.display = (style === 'poetry') ? 'flex' : 'none';
+
+            styleTitle.innerText = infoStyles[style].title;
+            styleDesc.innerText = infoStyles[style].desc;
+
+            buildSliders(style);
+            
+            t = 0;
+            lastPoemTime = 0; // Forzar actualización de poema inmediato
+            cancelAnimationFrame(animationFrameId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if(style === 'lifesim') initLifeSimulation();
+            if(style === 'poetry') generatePoem();
+
+            draw();
+        }
+
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            if(currentStyle === 'lifesim') initLifeSimulation();
+            draw();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- SISTEMAS DE DIBUJO Y ANIMACIÓN ---
+
+        function draw() {
+            // Limpieza controlada de fondo para evitar parpadeos o sobreescrituras incorrectas
+            if (currentStyle === 'netart' || currentStyle === 'random') {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Ejecución del motor gráfico según el estilo activo
+            switch(currentStyle) {
+                case 'netart': drawNetArt(); break;
+                case 'generative': drawGenerative(); break;
+                case 'procedural': drawProcedural(); break;
+                case 'random': drawRandom(); break;
+                case 'glitch': drawGlitch(); break;
+                case 'lifesim': drawLifeSim(); break;
+                case 'poetry': drawPoetry(); break;
+            }
+
+            // Centralización del bucle interactivo (Solo estilos dinámicos por tiempo)
+            if (['generative', 'procedural', 'glitch', 'lifesim', 'poetry'].includes(currentStyle)) {
+                animationFrameId = requestAnimationFrame(draw);
+            }
+        }
+
+        // 1. NET ART
+        function drawNetArt() {
+            ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(0, 255, 204, 0.2)'; ctx.lineWidth = 1;
+            let spacing = canvas.width / params.netLines;
+            for(let i = 0; i < canvas.width; i += spacing) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(canvas.width - i, canvas.height); ctx.stroke();
+            }
+            ctx.fillStyle = '#00ff00'; ctx.font = '11px monospace';
+            ctx.fillText("NET_SERVER_STATUS: ACTIVE // NODOS: " + params.netLines, 20, canvas.height - 20);
+        }
+
+        // 2. ARTE GENERATIVO
+        function drawGenerative() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.save(); ctx.translate(canvas.width / 2, canvas.height / 2);
+            t += params.genSpeed;
+            for(let i = 0; i < params.genLines; i++) {
+                ctx.rotate((Math.PI * 2) / params.genLines);
+                let x = Math.sin(t) * (canvas.height * params.genRadius);
+                let y = Math.cos(t / 2) * (canvas.height * params.genRadius);
+                ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fillStyle = `hsl(${(t * 22) % 360}, 100%, 60%)`; ctx.fill();
+                ctx.strokeStyle = `rgba(0, 255, 204, 0.15)`; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(x, y); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        // 3. ARTE PROCEDURAL
+        function drawProcedural() {
+            ctx.fillStyle = 'rgba(15, 15, 19, 0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#00ffcc'; ctx.lineWidth = 2; ctx.beginPath();
+            t += params.procSpeed;
+            for (let x = 0; x < canvas.width; x += 6) {
+                let y = canvas.height / 2 + Math.sin(x * params.procFreq + t) * params.procAmp + Math.cos(x * 0.02 - t * 1.5) * (params.procAmp * 0.4);
+                if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        // 4. ARTE RANDÓMICO
+        function drawRandom() {
+            for(let i = 0; i < params.randCount; i++) {
+                let x = Math.random() * canvas.width; let y = Math.random() * canvas.height; let size = Math.random() * 90 + 10;
+                let r = Math.floor(Math.random() * 256); let g = Math.floor(Math.random() * 256); let b = Math.floor(Math.random() * 256);
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${params.randAlpha})`;
+                if(Math.random() > 0.5) ctx.fillRect(x, y, size, size); else { ctx.beginPath(); ctx.arc(x, y, size/2, 0, Math.PI * 2); ctx.fill(); }
+            }
+        }
+
+        // 5. GLITCH ART
+        function drawGlitch() {
+            if(Math.random() > params.glitchFrec) { ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+            t++;
+            for(let i = 0; i < 2; i++) {
+                let y = Math.random() * canvas.height; let h = Math.random() * 25 + 5;
+                ctx.fillStyle = ['#ff0055', '#00ffcc', '#0033ff'][Math.floor(Math.random() * 3)]; ctx.fillRect(0, y, canvas.width, h);
+            }
+            if(t % 4 === 0) {
+                let sliceY = Math.random() * canvas.height; let sliceH = Math.random() * 40 + 10; let distortion = (Math.random() - 0.5) * params.glitchDistort;
+                try { let imgData = ctx.getImageData(0, sliceY, canvas.width, sliceH); ctx.putImageData(imgData, distortion, sliceY); } catch(e) {}
+            }
+        }
+
+        // 6. SIMULACIÓN DE VIDA (Agentes autónomos)
+        function initLifeSimulation() {
+            agents = [];
+            for(let i=0; i < params.lifeAgents; i++) {
+                agents.push({
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * params.lifeSpeed, vy: (Math.random() - 0.5) * params.lifeSpeed,
+                    size: Math.random() * 6 + 2, color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                    age: 0, maxAge: Math.random() * 300 + 200
+                });
+            }
+        }
+
+        function drawLifeSim() {
+            ctx.fillStyle = 'rgba(10, 10, 15, 0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            agents.forEach((agent, index) => {
+                agent.age++;
+                agent.x += agent.vx + (Math.random() - 0.5) * (params.lifeMutation * 0.5);
+                agent.y += agent.vy + (Math.random() - 0.5) * (params.lifeMutation * 0.5);
+
+                if(agent.x < 0 || agent.x > canvas.width) agent.vx *= -1;
+                if(agent.y < 0 || agent.y > canvas.height) agent.vy *= -1;
+
+                ctx.fillStyle = agent.color; ctx.beginPath(); ctx.arc(agent.x, agent.y, agent.size, 0, Math.PI * 2); ctx.fill();
+
+                for(let j = index + 1; j < agents.length; j++) {
+                    let dist = Math.hypot(agent.x - agents[j].x, agent.y - agents[j].y);
+                    if(dist < 60) {
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${1 - dist/60})`; ctx.lineWidth = 0.5;
+                        ctx.beginPath(); ctx.moveTo(agent.x, agent.y); ctx.lineTo(agents[j].x, agents[j].y); ctx.stroke();
+                    }
+                }
+
+                if(agent.age > agent.maxAge) {
+                    agents[index] = {
+                        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * params.lifeSpeed, vy: (Math.random() - 0.5) * params.lifeSpeed,
+                        size: Math.random() * 6 + 2, color: `hsl(${Math.random() * 360}, 80%, 60%)`, age: 0, maxAge: Math.random() * 300 + 200
+                    };
+                }
+            });
+        }
+
+        // 7. POESÍA ELECTRÓNICA
+        function generatePoem() {
+            let s = lexicon.sujetos[Math.floor(Math.random() * lexicon.sujetos.length)];
+            let v = lexicon.verbos[Math.floor(Math.random() * lexicon.verbos.length)];
+            let p = lexicon.predicados[Math.floor(Math.random() * lexicon.predicados.length)];
+
+            if(params.poetGlitch === 1) {
+                s = s.replace(/[aeiou]/gi, () => ["0", "1", "∅", "[X]", "_"][Math.floor(Math.random() * 5)]);
+                p = p.replace(/ /g, " ERROR_ ");
+            }
+            document.getElementById('line1').innerText = s;
+            document.getElementById('line2').innerText = v;
+            document.getElementById('line3').innerText = p;
+        }
+
+        function drawPoetry() {
+            ctx.fillStyle = '#0a0512'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(150, 0, 255, 0.06)';
+            t += 0.02;
+            for(let i=0; i<canvas.height; i+=25) {
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i + Math.sin(t + i)*40); ctx.stroke();
+            }
+
+            let now = Date.now();
+            if (now - lastPoemTime > params.poetFrec * 1000) {
+                generatePoem();
+                lastPoemTime = now;
+            }
+        }
+
+        // Interacción manual por Click
+        canvas.addEventListener('click', () => {
+            if(currentStyle === 'random' || currentStyle === 'netart') draw();
+        });
+
+        // Inicializar la aplicación
+        const firstBtn = document.querySelector('.menu-btn');
+        changeStyle('netart', firstBtn);
+        resizeCanvas();
+
+        // Drag & Drop para las ventanas de Net Art
+        document.querySelectorAll('.netart-window').forEach(windowEl => {
+            let isDragging = false; let offset = [0,0];
+            windowEl.querySelector('.netart-header').addEventListener('mousedown', (e) => {
+                isDragging = true; offset = [windowEl.offsetLeft - e.clientX, windowEl.offsetTop - e.clientY];
+            });
+            document.addEventListener('mouseup', () => isDragging = false);
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) { windowEl.style.left = (e.clientX + offset[0]) + 'px'; windowEl.style.top = (e.clientY + offset[1]) + 'px'; }
+            });
+        });
+    </script>
+</body>
+</html>
